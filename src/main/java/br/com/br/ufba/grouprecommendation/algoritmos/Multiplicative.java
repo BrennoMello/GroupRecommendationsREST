@@ -1,6 +1,5 @@
-
 package br.com.br.ufba.grouprecommendation.algoritmos;
 
-public class LeastMesery {
+public class Multiplicative extends Algorithms {
     
 }
