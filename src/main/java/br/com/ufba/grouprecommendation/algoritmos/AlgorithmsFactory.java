@@ -1,6 +1,6 @@
-package br.com.br.ufba.grouprecommendation.algoritmos;
+package br.com.ufba.grouprecommendation.algoritmos;
 
-import br.com.br.ufba.grouprecommendation.algoritmos.AlgorithmsType.Type;
+import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsType.Type;
 
 public class AlgorithmsFactory {
 

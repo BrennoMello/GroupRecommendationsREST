@@ -1,4 +1,4 @@
-package br.com.br.ufba.grouprecommendation.algoritmos;
+package br.com.ufba.grouprecommendation.algoritmos;
 
 class AlgorithmsType {
 

@@ -12,6 +12,7 @@ import java.util.HashMap;
  * @author edson
  */
 public class Usuario {
+    
     private String nome;
     private HashMap<Double, Integer> qtdLikeTemp;
     private HashMap<Double, Integer> qtdLikeLumino;

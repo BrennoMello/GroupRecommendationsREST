@@ -1,4 +1,4 @@
-package br.com.br.ufba.grouprecommendation.algoritmos;
+package br.com.ufba.grouprecommendation.algoritmos;
 
 public class LeastMisery extends Algorithms {
 

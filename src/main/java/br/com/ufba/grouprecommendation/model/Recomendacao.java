@@ -13,6 +13,7 @@ import java.util.List;
  * @author edson
  */
 public class Recomendacao {
+    
     private Date timeStamp;
     private List<Usuario> listUser;
 }
