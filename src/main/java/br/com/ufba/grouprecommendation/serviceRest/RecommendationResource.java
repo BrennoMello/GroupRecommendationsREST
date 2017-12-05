@@ -5,6 +5,7 @@
  */
 package br.com.ufba.grouprecommendation.serviceRest;
 
+import java.util.List;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Produces;
@@ -14,6 +15,23 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+
+/* Testes */
+import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsFactory;
+import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsType;
+import br.com.ufba.grouprecommendation.algoritmos.Multiplicative;
+import br.com.ufba.grouprecommendation.model.User;
+import br.com.ufba.grouprecommendation.model.Vote;
+import br.com.ufba.grouprecommendation.model.Data;
+import br.com.ufba.grouprecommendation.dao.MySQLObject;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+
+
+        
+
 
 /**
  * REST Web Service
@@ -26,6 +44,9 @@ public class RecommendationResource {
 
     @Context
     private UriInfo context;
+    
+    private List<User> ListData;
+    
 
     /**
      * Creates a new instance of RecommendationResource
@@ -57,7 +78,28 @@ public class RecommendationResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String getAllRecommendation(){
         
-        return "FDP";
+        
+        
+        /* TESTE DADOS BANCO */
+        Data e = new Data();
+        try {
+            ListData =  e.getMySQLSyntheticData(Integer.valueOf(2)); /* RECUPERAR DADOS DAS ULTIMAS DUAS HORAS */
+        } catch (SQLException ex) {
+            Logger.getLogger(RecommendationResource.class.getName()).log(Level.SEVERE, null, ex);
+             return ex.toString();
+        }
+       return "ok";
+        
+        
+        
+//        AlgorithmsFactory f = new AlgorithmsFactory();
+//        Vote R;
+//        Multiplicative M;
+//        M = (Multiplicative) f.getAlgorithm(AlgorithmsType.Type.Multiplicative);
+//        return M.GetAll(ListData).toString();
+
+               
+        //return "FDP";
     }
     
     
