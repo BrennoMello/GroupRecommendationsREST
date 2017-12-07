@@ -233,9 +233,9 @@ public class Data {
                 
                Statement stmVoto = MySQLObject.getConexaoMySQL().createStatement();
                String sqlQueryVoto =    " SELECT CONVERT(time,DATETIME) AS time, scale, value, userid  FROM mate84.users  "
-                            + " WHERE CONVERT(time,DATETIME) BETWEEN DATE_ADD(CONVERT(NOW(),DATETIME), INTERVAL " + (ultimas_horas * (-1)) + " HOUR) AND CONVERT(time,DATETIME) "
+                            + " WHERE CONVERT(time,DATETIME) BETWEEN DATE_ADD(CONVERT(NOW(),DATETIME), INTERVAL " + " HOUR) AND CONVERT(time,DATETIME) "
                             + " AND userid = '" + user.getId() + "' "
-                            + " AND scale = "  + rsScale.getString("scale") + " "
+                            + " AND scale = "  + user.getId() + " "
                             + " ORDER BY  CONVERT(time,DATETIME) DESC " ; ;
                ResultSet queryVoto = stmVoto.executeQuery(sqlQueryVoto);
            
@@ -250,7 +250,7 @@ public class Data {
             Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
         }
        
-        
+        return null;
     }
 
     
