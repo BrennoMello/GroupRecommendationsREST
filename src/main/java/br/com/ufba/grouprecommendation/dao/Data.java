@@ -85,7 +85,7 @@ public class Data {
         ResultSet rsUsersByLastHour; //= sUserSelc.executeQuery(sqlQuery);
 
         Statement stmscale =  MySQLObject.getConexaoMySQL().createStatement(); 
-        String sqlQuery =  " SELECT DISTINCT scale FROM mate84.users ORDER BY scale  " ;
+        String sqlQuery =  " SELECT DISTINCT value FROM mate84.users ORDER BY value " ;
         ResultSet rsScale = stmscale.executeQuery(sqlQuery);
 
         Statement stmuser =  MySQLObject.getConexaoMySQL().createStatement(); 
@@ -108,7 +108,7 @@ public class Data {
                 sqlQuery =    " SELECT CONVERT(time,DATETIME) AS time, scale, value, userid  FROM mate84.users  "
                             + " WHERE CONVERT(time,DATETIME) BETWEEN DATE_ADD(CONVERT(NOW(),DATETIME), INTERVAL " + (ultimas_horas * (-1)) + " HOUR) AND CONVERT(time,DATETIME) "
                             + " AND userid = '" + rsUsers.getString("userid") + "' "
-                            + " AND scale = "  + rsScale.getString("scale") + " "
+                            + " AND value = "  + rsScale.getString("value") + " "
                             + " ORDER BY  CONVERT(time,DATETIME) DESC " ;
                 System.out.println(sqlQuery);
                 rsUsersByLastHour = sUserSelc.executeQuery(sqlQuery);
@@ -120,6 +120,7 @@ public class Data {
                         
                             vote = new Vote();   
                             System.out.println(rsUsersByLastHour.getDouble("value"));
+                            System.out.println(rsUsersByLastHour.getDouble("scale"));
                             vote.setVote(rsUsersByLastHour.getDouble("value"));
                             vote.setScaleValue(rsUsersByLastHour.getDouble("scale"));
                             ListVote.add(vote);
@@ -162,6 +163,10 @@ public class Data {
             u = new User();
             u.setName(rsUsers.getString("userid"));
             u.setVote(ListVote);
+            for (Vote vote1 : ListVote) {
+                System.out.println("1: " + vote1.getScaleValue());
+                System.out.println("2: " + vote1.getVote());
+            }
             
             ListUsers.add(u);
             rsScale.beforeFirst();
@@ -220,38 +225,5 @@ public class Data {
 
      }
     
-    public List<Usuario> getVotoTemp(){
-       
-        try {
-           Statement stmUser = MySQLObject.getConexaoMySQL().createStatement();
-           String sqlQueryUser =  " SELECT DISTINCT userid FROM mate84.users " ;
-           ResultSet queryUsers = stmUser.executeQuery(sqlQueryUser);
-           
-           while(queryUsers.next()){
-               User user = new User();
-               user.setId(queryUsers.getString("userid"));
-                
-               Statement stmVoto = MySQLObject.getConexaoMySQL().createStatement();
-               String sqlQueryVoto =    " SELECT CONVERT(time,DATETIME) AS time, scale, value, userid  FROM mate84.users  "
-                            + " WHERE CONVERT(time,DATETIME) BETWEEN DATE_ADD(CONVERT(NOW(),DATETIME), INTERVAL " + " HOUR) AND CONVERT(time,DATETIME) "
-                            + " AND userid = '" + user.getId() + "' "
-                            + " AND scale = "  + user.getId() + " "
-                            + " ORDER BY  CONVERT(time,DATETIME) DESC " ; ;
-               ResultSet queryVoto = stmVoto.executeQuery(sqlQueryVoto);
-           
-               
-               
-               
-               
-           }
-           
         
-        } catch (SQLException ex) {
-            Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
-        }
-       
-        return null;
-    }
-
-    
 }

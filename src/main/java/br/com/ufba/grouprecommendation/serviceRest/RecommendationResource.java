@@ -68,12 +68,11 @@ public class RecommendationResource {
         if(id==1){
             Data createData = new Data();
             try {
-                createData.putMySQLSyntheticData();
+                createData.getMySQLSyntheticData(5);
             } catch (SQLException ex) {
                 System.out.print(ex.getMessage());
-            } catch (ParseException ex) {
-                System.out.print(ex.getMessage());
-            }
+            } 
+            
             return "full data";
         }
         return "VSF";
