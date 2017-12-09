@@ -3,6 +3,7 @@ package br.com.ufba.grouprecommendation.dao;
 import br.com.ufba.grouprecommendation.model.User;
 import br.com.ufba.grouprecommendation.model.Usuario;
 import br.com.ufba.grouprecommendation.model.Vote;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -163,11 +164,7 @@ public class Data {
             u = new User();
             u.setName(rsUsers.getString("userid"));
             u.setVote(ListVote);
-            for (Vote vote1 : ListVote) {
-                System.out.println("1: " + vote1.getScaleValue());
-                System.out.println("2: " + vote1.getVote());
-            }
-            
+                       
             ListUsers.add(u);
             rsScale.beforeFirst();
         } 
@@ -224,6 +221,79 @@ public class Data {
 //        }
 
      }
+    
+    public List<User> getLastVotoTemp(){
+       
+        List<User> listUser= null;
+                
+        try {
+           Statement stmUser = MySQLObject.getConexaoMySQL().createStatement();
+           String sqlQueryUser =  " SELECT DISTINCT userid FROM mate84.users " ;
+           ResultSet queryUsers = stmUser.executeQuery(sqlQueryUser);
+           
+           Statement stmValue=  MySQLObject.getConexaoMySQL().createStatement(); 
+           String sqlQueryValue =  " SELECT DISTINCT value FROM mate84.users ORDER BY value " ;
+           ResultSet rsValue = stmValue.executeQuery(sqlQueryValue);
+           
+          listUser = new ArrayList<>();
+           
+           while(queryUsers.next()){ // Para um usuario
+               User user = new User();
+               user.setId(queryUsers.getString("userid"));
+               List <Vote> listVotos = new ArrayList<>();
+               
+               
+               
+               while(rsValue.next()){ // Para cada valor de temperatura
+                   
+                    
+                    String sqlQueryVoto =      "select CONVERT(time,DATETIME) AS time, scale, value, userid"
+                                             + " from mate84.users"
+                                             + " where userid = ? and value = ?"
+                                             + " order by time desc"
+                                             + " limit 1 ";
+                    PreparedStatement stmVoto = MySQLObject.getConexaoMySQL().prepareStatement(sqlQueryVoto);
+                    stmVoto.setString(1, user.getId());
+                    stmVoto.setDouble(2, rsValue.getDouble("value"));
+                    
+                    ResultSet rsVoto = stmVoto.executeQuery();
+                    Vote voto = new Vote();
+                    voto.setVote(rsValue.getDouble("value"));
+                    
+                    try{ // Pega ultimo voto
+                        
+                        rsVoto.next();
+                        voto.setScaleValue(rsVoto.getDouble("scale"));   
+                        
+                    }catch(SQLException e){
+                        System.out.println(e.getMessage());
+                        voto.setScaleValue(0);   
+                    }
+                    
+                    System.out.println(voto.getScaleValue());
+                    System.out.println(voto.getVote());
+                    listVotos.add(voto);
+               
+               }
+               
+               rsValue.beforeFirst();
+               user.setVote(listVotos);
+               System.out.println("User add: " + user.getId());
+               listUser.add(user);
+           
+           }
+           
+           stmUser.close();
+           stmValue.close();
+           
+        } catch (SQLException ex) {
+            Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        return listUser;
+    }
+
     
         
 }

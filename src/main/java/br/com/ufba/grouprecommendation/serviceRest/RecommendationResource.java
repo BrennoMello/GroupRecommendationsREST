@@ -67,14 +67,11 @@ public class RecommendationResource {
     public String getRecommendation(@QueryParam("id") int id) {
         if(id==1){
             Data createData = new Data();
-            try {
-                createData.getMySQLSyntheticData(5);
-            } catch (SQLException ex) {
-                System.out.print(ex.getMessage());
-            } 
+            createData.getLastVotoTemp();
             
             return "full data";
-        }
+        } 
+            
         return "VSF";
     }
     
@@ -83,9 +80,7 @@ public class RecommendationResource {
     @Path("/recommenderAll")
     @Produces(MediaType.APPLICATION_JSON)
     public String getAllRecommendation(){
-        
-        
-        
+            
         /* TESTE DADOS BANCO */
         Data e = new Data();
         try {
