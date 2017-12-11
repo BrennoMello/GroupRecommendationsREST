@@ -190,7 +190,7 @@ public class Data {
            
           listUser = new ArrayList<>();
            
-           while(queryUsers.next()){ // Para um usuario
+           while(queryUsers.next()){ // Para cada usuario
                User user = new User();
                user.setId(queryUsers.getString("userid"));
                List <Vote> listVotos = new ArrayList<>();
@@ -205,6 +205,7 @@ public class Data {
                                              + " where userid = ? and value = ?"
                                              + " order by time desc"
                                              + " limit 1 ";
+                    
                     PreparedStatement stmVoto = MySQLObject.getConexaoMySQL().prepareStatement(sqlQueryVoto);
                     stmVoto.setString(1, user.getId());
                     stmVoto.setDouble(2, rsValue.getDouble("value"));
