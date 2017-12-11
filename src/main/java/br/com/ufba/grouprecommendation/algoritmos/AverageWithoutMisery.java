@@ -25,8 +25,7 @@ public class AverageWithoutMisery extends Algorithms {
         List<Vote> list_vote_temp = new ArrayList<>();
 
         List<Double> scale = list.stream().map(p -> 
-                p.getVote().stream().map(v -> v.getScaleValue()).collect(Collectors.toList())
-        ).collect(Collectors.toList()).get(0);
+                p.getVote().stream().map(v -> v.getScaleValue()).collect(Collectors.toList())).collect(Collectors.toList()).get(0);
         
         for (Object s : scale) {
 
@@ -78,4 +77,13 @@ public class AverageWithoutMisery extends Algorithms {
         
     }
     
+
+    public void calcAverageWithoutMisery(List<User> listUser, double limit){
+        
+        
+        
+        
+    }
+
+
 }

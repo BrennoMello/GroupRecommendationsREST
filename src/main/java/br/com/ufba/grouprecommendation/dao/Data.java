@@ -1,7 +1,6 @@
 package br.com.ufba.grouprecommendation.dao;
 
 import br.com.ufba.grouprecommendation.model.User;
-import br.com.ufba.grouprecommendation.model.Usuario;
 import br.com.ufba.grouprecommendation.model.Vote;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +11,6 @@ import java.text.ParseException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -172,6 +170,7 @@ public class Data {
             ListUsers.add(u);
             rsValue.beforeFirst();
         } 
+        
         return ListUsers;
      }
     
@@ -212,16 +211,16 @@ public class Data {
                     
                     ResultSet rsVoto = stmVoto.executeQuery();
                     Vote voto = new Vote();
-                    voto.setVote(rsValue.getDouble("value"));
+                    voto.setScaleValue(rsValue.getDouble("value"));
                     
                     try{ // Pega ultimo voto
                         
                         rsVoto.next();
-                        voto.setScaleValue(rsVoto.getDouble("scale"));   
+                        voto.setVote(rsVoto.getDouble("scale"));   
                         
                     }catch(SQLException e){
                         System.out.println(e.getMessage());
-                        voto.setScaleValue(0);   
+                        voto.setVote(0);   
                     }
                     
                     System.out.println(voto.getScaleValue());

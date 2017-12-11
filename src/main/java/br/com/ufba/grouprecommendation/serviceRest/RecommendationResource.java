@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 /* Testes */
 import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsFactory;
 import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsType;
+import br.com.ufba.grouprecommendation.algoritmos.AverageWithoutMisery;
 import br.com.ufba.grouprecommendation.algoritmos.Multiplicative;
 import br.com.ufba.grouprecommendation.model.User;
 import br.com.ufba.grouprecommendation.model.Vote;
@@ -65,11 +66,18 @@ public class RecommendationResource {
     @Path("/recommenderIndividual")
     @Produces(MediaType.APPLICATION_JSON)
     public String getRecommendation(@QueryParam("id") int id) {
+        Data createData = new Data();
+        AlgorithmsFactory factory = new AlgorithmsFactory();
+        
+        
         if(id==1){
-            Data createData = new Data();
-            createData.getLastVotoTemp();
-            
-            return "full data";
+           List<User> listUser = createData.getLastVotoTemp();
+           AverageWithoutMisery averageWith = (AverageWithoutMisery) factory.getAlgorithm(AlgorithmsType.Type.AverageWithoutMisery);
+           Vote vote = averageWith.GetResult(listUser, 1);
+           
+          
+           
+           return String.valueOf(vote.getScaleValue() + " " + vote.getVote());
         } 
             
         return "VSF";
@@ -89,7 +97,9 @@ public class RecommendationResource {
             Logger.getLogger(RecommendationResource.class.getName()).log(Level.SEVERE, null, ex);
             return ex.toString();
         }
-       return "ok";
+       
+        
+        return "ok";
         
         
         
