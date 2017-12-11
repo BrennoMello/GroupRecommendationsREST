@@ -47,7 +47,9 @@ public class MySQLObject {
     public static Connection getConexaoMySQL() {
         if (!flag) {
             conn =  CreateMySQLConnection();
-            flag = true;
+            if(conn != null)    
+                flag = true;
+            
             return conn;
         } else {
             return conn;
@@ -65,10 +67,10 @@ public class MySQLObject {
 
         // Configurando a nossa conexão com um banco de dados//
         String serverName = "localhost";    //caminho do servidor do BD
-        String mydatabase ="mysql";        //nome do seu banco de dados
+        String mydatabase ="mate84";        //nome do seu banco de dados
         String url = "jdbc:mysql://" + serverName + "/" + mydatabase;
         String username = "root";        //nome de um usuário de seu BD      
-        String password = "u2091010";      //sua senha de acesso
+        String password = "root";      //sua senha de acesso
         conn = DriverManager.getConnection(url, username, password);
 
         //Testa sua conexão//  
@@ -83,10 +85,10 @@ public class MySQLObject {
     } catch (ClassNotFoundException e) {  //Driver não encontrado
         System.out.println("O driver expecificado nao foi encontrado.");
         return null;
-        } catch (SQLException e) {
-            //Não conseguindo se conectar ao banco
-            System.out.println("Nao foi possivel conectar ao Banco de Dados.");
-            return null;
+    } catch (SQLException e) {
+        //Não conseguindo se conectar ao banco
+        System.out.println("Nao foi possivel conectar ao Banco de Dados.");
+        return null;
         }
     }
 

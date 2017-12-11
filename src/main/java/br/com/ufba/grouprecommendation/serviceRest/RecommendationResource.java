@@ -17,12 +17,14 @@ import javax.ws.rs.core.MediaType;
 /* Testes */
 import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsFactory;
 import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsType;
+import br.com.ufba.grouprecommendation.algoritmos.AverageWithoutMisery;
 import br.com.ufba.grouprecommendation.algoritmos.Multiplicative;
 import br.com.ufba.grouprecommendation.model.User;
 import br.com.ufba.grouprecommendation.model.Vote;
-import br.com.ufba.grouprecommendation.model.Data;
+import br.com.ufba.grouprecommendation.dao.Data;
 import br.com.ufba.grouprecommendation.dao.MySQLObject;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,9 +66,20 @@ public class RecommendationResource {
     @Path("/recommenderIndividual")
     @Produces(MediaType.APPLICATION_JSON)
     public String getRecommendation(@QueryParam("id") int id) {
-        if(id==1)
-            return "VSF2";
+        Data createData = new Data();
+        AlgorithmsFactory factory = new AlgorithmsFactory();
         
+        
+        if(id==1){
+           List<User> listUser = createData.getLastVotoTemp();
+           AverageWithoutMisery averageWith = (AverageWithoutMisery) factory.getAlgorithm(AlgorithmsType.Type.AverageWithoutMisery);
+           Vote vote = averageWith.GetResult(listUser, 1);
+           
+          
+           
+           return String.valueOf(vote.getScaleValue() + " " + vote.getVote());
+        } 
+            
         return "VSF";
     }
     
@@ -75,18 +88,18 @@ public class RecommendationResource {
     @Path("/recommenderAll")
     @Produces(MediaType.APPLICATION_JSON)
     public String getAllRecommendation(){
-        
-        
-        
+            
         /* TESTE DADOS BANCO */
         Data e = new Data();
         try {
             ListData =  e.getMySQLSyntheticData(Integer.valueOf(2)); /* RECUPERAR DADOS DAS ULTIMAS DUAS HORAS */
         } catch (SQLException ex) {
             Logger.getLogger(RecommendationResource.class.getName()).log(Level.SEVERE, null, ex);
-             return ex.toString();
+            return ex.toString();
         }
-       return "ok";
+       
+        
+        return "ok";
         
         
         

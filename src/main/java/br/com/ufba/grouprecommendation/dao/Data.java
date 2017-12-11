@@ -1,22 +1,21 @@
-package br.com.ufba.grouprecommendation.model;
+package br.com.ufba.grouprecommendation.dao;
 
-import br.com.ufba.grouprecommendation.dao.MySQLObject;
+import br.com.ufba.grouprecommendation.model.User;
+import br.com.ufba.grouprecommendation.model.Vote;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Month;
-import java.time.Period;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Data {
 
@@ -27,9 +26,9 @@ public class Data {
         Statement s =  MySQLObject.getConexaoMySQL().createStatement(); 
         String sqlQuery =  " DELETE FROM mate84.users  " ;
         s.executeUpdate(sqlQuery);
-        
-        LocalDateTime timeStart = LocalDateTime.of(2017, Month.DECEMBER, 01, 9, 00, 00);
-        LocalDateTime timeEnd = LocalDateTime.of(2017, Month.DECEMBER, 01, 22, 00, 00);
+                
+        LocalDateTime timeStart = LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth() , LocalDate.now().getDayOfMonth(), 9, 00, 00);
+        LocalDateTime timeEnd = LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth(), LocalDate.now().getDayOfMonth(), 22, 00, 00);
         Duration oneHours = Duration.between(timeStart, timeEnd);
         
         long qtHoras = oneHours.toHours();
@@ -47,7 +46,7 @@ public class Data {
         String userid;
          
         /* Support */
-        Integer margemtime;
+        Integer rangetime;
         Random rn = new Random();
         Integer count=0;
         
@@ -57,10 +56,10 @@ public class Data {
             for (int v=0;v<=qtVotesByHour;v++) {
                 count+=1;
                 
-                margemtime= (rn.nextInt(intervalo - 1 + 1) + 1);
-                datetime = LocalDateTime.of(datetime.toLocalDate(), datetime.toLocalTime()).plusMinutes(margemtime);
-                value = (rn.nextInt(rating - 1 + 1) + 1);
-                scale = rn.nextInt((28 - 22) + 1) + 22;;
+                rangetime= (rn.nextInt(intervalo - 1 + 1) + 1);
+                datetime = LocalDateTime.of(datetime.toLocalDate(), datetime.toLocalTime()).plusMinutes(rangetime);
+                value = rn.nextInt((28 - 22) + 1) + 22;
+                scale = (rn.nextInt(rating - 1 + 1) + 1);
                 sensor_type = "temperature";
                 unit="celsius";
                 userid =  "User" + (rn.nextInt(qtUsers - 1 + 1) + 1);
@@ -74,7 +73,7 @@ public class Data {
         }
     }
     
-    /* Obtem os dados do Mysql */
+    /* Obtém os dados do Mysql */
     public List<User> getMySQLSyntheticData(Integer ultimas_horas) throws SQLException {
         
         /* Recebe dados do Banco */
@@ -86,8 +85,8 @@ public class Data {
         ResultSet rsUsersByLastHour; //= sUserSelc.executeQuery(sqlQuery);
 
         Statement stmscale =  MySQLObject.getConexaoMySQL().createStatement(); 
-        String sqlQuery =  " SELECT DISTINCT scale FROM mate84.users ORDER BY scale  " ;
-        ResultSet rsScale = stmscale.executeQuery(sqlQuery);
+        String sqlQuery =  " SELECT DISTINCT value FROM mate84.users ORDER BY value " ; /* Valores das medidas (teperatura) */
+        ResultSet rsValue = stmscale.executeQuery(sqlQuery);
 
         Statement stmuser =  MySQLObject.getConexaoMySQL().createStatement(); 
         sqlQuery =  " SELECT DISTINCT userid FROM mate84.users " ;
@@ -103,33 +102,37 @@ public class Data {
             
             ListVote = new ArrayList<>();
             
-            while (rsScale.next()) { /* Em um dado item da escala Y */
+            while (rsValue.next()) { /* Em um dado item da escala Y - Itera sobre as medidas */
 
                 /* Consulta horas do usuário seleiconado */
                 sqlQuery =    " SELECT CONVERT(time,DATETIME) AS time, scale, value, userid  FROM mate84.users  "
                             + " WHERE CONVERT(time,DATETIME) BETWEEN DATE_ADD(CONVERT(NOW(),DATETIME), INTERVAL " + (ultimas_horas * (-1)) + " HOUR) AND CONVERT(time,DATETIME) "
                             + " AND userid = '" + rsUsers.getString("userid") + "' "
-                            + " AND scale = "  + rsScale.getString("scale") + " "
+                            + " AND value = "  + rsValue.getString("value") + " "
                             + " ORDER BY  CONVERT(time,DATETIME) DESC " ;
                 System.out.println(sqlQuery);
                 rsUsersByLastHour = sUserSelc.executeQuery(sqlQuery);
                 
-                while (rsUsersByLastHour.next()) { /* Nos registro de ultima hora  */  
+                while (rsUsersByLastHour.next()) { /* Irata sobre os registro das ultimas x horas  */  
                             //System.out.println(rsUsers.getString("userid"));
                             //System.out.println(rsScale.getString("scale"));
                             //System.out.println(rsUsersByLastHour.getString("value"));
                         
                             vote = new Vote();   
-                            System.out.println(rsUsersByLastHour.getDouble("value"));
-                            vote.setVote(rsUsersByLastHour.getDouble("value"));
-                            vote.setScaleValue(rsUsersByLastHour.getDouble("scale"));
+                            System.out.println(rsUsersByLastHour.getDouble("scale")); 
+                           
+                            /*  Aqui há uma mudança: Os valores de escala que no banco são os valores de preferencia, são persistidos aqui como escala = medida (Temperatura A,Temperatura B, etc)  
+                                Do mesmo modo, os valores de preferencia são descrito no banco de dados como scale, mas no modelo de objeto são descritos como "value", logo: value = preferencias)
+                            */
+                            vote.setVote(rsUsersByLastHour.getDouble("scale")); /* Armazena a preferencia (1 a 5) */
+                            vote.setScaleValue(rsUsersByLastHour.getDouble("value")); /* armazena o valor da medida (tempratura) */
                             ListVote.add(vote);
                             hasvoted = true;
                             break;
                   
                 }
                 
-                /*  Usuários que não votaram na ultioma hpra mas estão na lista aplicar o 
+                /*  Usuários que não votaram na ultima hora mas estão na lista aplicar o 
                     calculo da quantidade de vezes que ele votou em casa ítem e assumir a quantidade como o rating 
                     [min:1 Max: 5]*/
                 if (!hasvoted) {
@@ -138,8 +141,8 @@ public class Data {
                     //System.out.println(rsScale.getString("scale"));
                     //System.out.println(rsUsersByLastHour.getString("value"));
                             
-                    //Filtra pelo valor da escala, se for 0 o valor rating será 1, se for maior será a sumarização de no máximo 5 itens  
-                    sqlQuery =  " SELECT count(*) total FROM mate84.users WHERE scale = " +  rsScale.getString("scale")  + " and userid='" + rsUsers.getString("userid") +"'";
+                    //Filtra pelo valor da medida, se a cntagem for 0 o valor rating (scale) será 1, se for (> 0), será a sumarização de no máximo 5 itens  
+                    sqlQuery =  " SELECT count(*) total FROM mate84.users WHERE value = " +  rsValue.getString("value")  + " and userid='" + rsUsers.getString("userid") +"'";
                     System.out.println(sqlQuery);
                     rsTemp = sgeral.executeQuery(sqlQuery);
                     if (rsTemp.next()) {
@@ -150,7 +153,7 @@ public class Data {
                         } else if (rsTemp.getInt("total") == 0) {
                             vote.setVote(1);
                         }
-                        vote.setScaleValue(rsScale.getDouble("scale"));
+                        vote.setScaleValue(rsValue.getDouble("value"));
                         ListVote.add(vote);                        
                     }
                     
@@ -165,76 +168,85 @@ public class Data {
             u.setVote(ListVote);
             
             ListUsers.add(u);
-            rsScale.beforeFirst();
+            rsValue.beforeFirst();
         } 
+        
         return ListUsers;
-        
-        
-        
-       
-            
-                
-          
-            
-            
-     
-        
-//        List<Vote> v = new ArrayList<Vote>();
-//        
-//        Vote vote;
-//        vote = new Vote();
-//        vote.setScaleValue(22);
-//        vote.setScaleValue(5);
-//        v.add(vote);
-//              
-//        vote = new Vote();
-//        vote.setScaleValue(23);
-//        vote.setScaleValue(1);
-//        v.add(vote);
-//
-//        vote = new Vote();
-//        vote.setScaleValue(24);
-//        vote.setScaleValue(2);        
-//        v.add(vote);
-//        
-//        vote = new Vote();
-//        vote.setScaleValue(26);
-//        vote.setScaleValue(2);                
-//        v.add(vote);
-//
-//        vote = new Vote();
-//        vote.setScaleValue(27);
-//        vote.setScaleValue(2);                
-//        v.add(vote);
-//        
-//        vote = new Vote();
-//        vote.setScaleValue(28);
-//        vote.setScaleValue(2);                
-//        v.add(vote);
-//
-//        /* Adiciona nome e votos */
-//        User u = new User();
-//        u.setName("Usuário1");
-//        u.setVote(v);
-        
-        
-        
-      
-
-        
-        
-        
-//        Data2 oVote;
-//        List<Data2> Votos = new ArrayList<>();
-//        
-//        Random rn = new Random();
-//     
-//        for (int row = 1;row<=rates;row++) {
-//            oVote= new Data2();
-//            oVote.setName("User" +  row);
-//        }
-
      }
+    
+    public List<User> getLastVotoTemp(){
+       
+        List<User> listUser= null;
+                
+        try {
+           Statement stmUser = MySQLObject.getConexaoMySQL().createStatement();
+           String sqlQueryUser =  " SELECT DISTINCT userid FROM mate84.users " ;
+           ResultSet queryUsers = stmUser.executeQuery(sqlQueryUser);
+           
+           Statement stmValue=  MySQLObject.getConexaoMySQL().createStatement(); 
+           String sqlQueryValue =  " SELECT DISTINCT value FROM mate84.users ORDER BY value " ;
+           ResultSet rsValue = stmValue.executeQuery(sqlQueryValue);
+           
+          listUser = new ArrayList<>();
+           
+           while(queryUsers.next()){ // Para cada usuario
+               User user = new User();
+               user.setId(queryUsers.getString("userid"));
+               List <Vote> listVotos = new ArrayList<>();
+               
+               
+               
+               while(rsValue.next()){ // Para cada valor de temperatura
+                   
+                    
+                    String sqlQueryVoto =      "select CONVERT(time,DATETIME) AS time, scale, value, userid"
+                                             + " from mate84.users"
+                                             + " where userid = ? and value = ?"
+                                             + " order by time desc"
+                                             + " limit 1 ";
+                    
+                    PreparedStatement stmVoto = MySQLObject.getConexaoMySQL().prepareStatement(sqlQueryVoto);
+                    stmVoto.setString(1, user.getId());
+                    stmVoto.setDouble(2, rsValue.getDouble("value"));
+                    
+                    ResultSet rsVoto = stmVoto.executeQuery();
+                    Vote voto = new Vote();
+                    voto.setScaleValue(rsValue.getDouble("value"));
+                    
+                    try{ // Pega ultimo voto
+                        
+                        rsVoto.next();
+                        voto.setVote(rsVoto.getDouble("scale"));   
+                        
+                    }catch(SQLException e){
+                        System.out.println(e.getMessage());
+                        voto.setVote(0);   
+                    }
+                    
+                    System.out.println(voto.getScaleValue());
+                    System.out.println(voto.getVote());
+                    listVotos.add(voto);
+               
+               }
+               
+               rsValue.beforeFirst();
+               user.setVote(listVotos);
+               System.out.println("User add: " + user.getId());
+               listUser.add(user);
+           
+           }
+           
+           stmUser.close();
+           stmValue.close();
+           
+        } catch (SQLException ex) {
+            Logger.getLogger(Data.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        return listUser;
+    }
 
     
+        
 }
