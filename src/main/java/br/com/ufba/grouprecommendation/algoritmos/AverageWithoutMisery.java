@@ -34,14 +34,14 @@ public class AverageWithoutMisery extends Algorithms {
             ).collect(Collectors.toList());
              
             for (Vote v : votes_filter) {
-                sum+=((double) v.getVote());
+                sum += ((double) v.getVote());
                 if (v.getVote() < limit) {
                     isLimit=true;
                     break;
                 }
             }
            
-            if (! isLimit) {
+            if (!isLimit) {
                media = (double) (sum /( (double) votes_filter.size()));  
             } else {
                 media=-1;

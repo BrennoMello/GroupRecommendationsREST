@@ -191,7 +191,7 @@ public class Data {
            
            while(queryUsers.next()){ // Para cada usuario
                User user = new User();
-               user.setId(queryUsers.getString("userid"));
+               user.setName(queryUsers.getString("userid"));
                List <Vote> listVotos = new ArrayList<>();
                
                
@@ -206,7 +206,7 @@ public class Data {
                                              + " limit 1 ";
                     
                     PreparedStatement stmVoto = MySQLObject.getConexaoMySQL().prepareStatement(sqlQueryVoto);
-                    stmVoto.setString(1, user.getId());
+                    stmVoto.setString(1, user.getName());
                     stmVoto.setDouble(2, rsValue.getDouble("value"));
                     
                     ResultSet rsVoto = stmVoto.executeQuery();
@@ -231,7 +231,7 @@ public class Data {
                
                rsValue.beforeFirst();
                user.setVote(listVotos);
-               System.out.println("User add: " + user.getId());
+               System.out.println("User add: " + user.getName());
                listUser.add(user);
            
            }

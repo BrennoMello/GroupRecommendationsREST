@@ -65,8 +65,9 @@ public class RecommendationResource {
     @GET
     @Path("/recommenderIndividual")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getRecommendation(@QueryParam("id") int id) {
+    public String getRecommendation(@QueryParam("id") int id) throws SQLException, ParseException {
         Data createData = new Data();
+        
         AlgorithmsFactory factory = new AlgorithmsFactory();
         
         

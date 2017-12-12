@@ -6,7 +6,6 @@ public class User {
     
     
     private String Name; /* Nome do usuáiro */
-    private String id;
     private List<Vote> Vote;  
 
     public String getName() {
@@ -25,20 +24,7 @@ public class User {
         this.Vote = Vote;
     }
 
-    /**
-     * @return the id
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * @param id the id to set
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-        
+      
        
         
         
