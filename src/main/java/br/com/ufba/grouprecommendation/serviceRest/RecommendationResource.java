@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsFactory;
 import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsType;
 import br.com.ufba.grouprecommendation.algoritmos.AverageWithoutMisery;
+import br.com.ufba.grouprecommendation.algoritmos.LeastMisery;
 import br.com.ufba.grouprecommendation.algoritmos.Multiplicative;
 import br.com.ufba.grouprecommendation.model.User;
 import br.com.ufba.grouprecommendation.model.Vote;
@@ -67,20 +68,23 @@ public class RecommendationResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String getRecommendation(@QueryParam("id") int id) throws SQLException, ParseException {
         Data createData = new Data();
-        
         AlgorithmsFactory factory = new AlgorithmsFactory();
+        List<User> listUser = createData.getLastVotoTemp();
         
+        switch (id) {
+             case 1: 
+                AverageWithoutMisery averageWith = (AverageWithoutMisery) factory.getAlgorithm(AlgorithmsType.Type.AverageWithoutMisery);
+                Vote voteaverageWith = averageWith.GetResult(listUser, 1);
+                
+                return String.valueOf(voteaverageWith.getScaleValue() + " " + voteaverageWith.getVote());
+                
+             case 2:  
+                 LeastMisery leastMisery = (LeastMisery) factory.getAlgorithm(AlgorithmsType.Type.LeastMisery);
+                 Vote voteleastMisery = leastMisery.GetResult(listUser);
+                 
+                 return String.valueOf(voteleastMisery.getVote());
+        }
         
-        if(id==1){
-           List<User> listUser = createData.getLastVotoTemp();
-           AverageWithoutMisery averageWith = (AverageWithoutMisery) factory.getAlgorithm(AlgorithmsType.Type.AverageWithoutMisery);
-           Vote vote = averageWith.GetResult(listUser, 1);
-           
-          
-           
-           return String.valueOf(vote.getScaleValue() + " " + vote.getVote());
-        } 
-            
         return "VSF";
     }
     

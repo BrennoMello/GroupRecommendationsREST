@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class Summarized extends Algorithms  {
     
-    public List<User>GetAll(List<User> list,  String nome_algoritmo ) {
+    public List<User> GetAll(List<User> list,  String nome_algoritmo ) {
 
         double calc=0;
 
