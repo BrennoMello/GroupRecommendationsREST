@@ -18,7 +18,9 @@ import javax.ws.rs.core.MediaType;
 import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsFactory;
 import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsType;
 import br.com.ufba.grouprecommendation.algoritmos.AverageWithoutMisery;
+import br.com.ufba.grouprecommendation.algoritmos.BordaCount;
 import br.com.ufba.grouprecommendation.algoritmos.LeastMisery;
+import br.com.ufba.grouprecommendation.algoritmos.MostPleasure;
 import br.com.ufba.grouprecommendation.algoritmos.Multiplicative;
 import br.com.ufba.grouprecommendation.model.User;
 import br.com.ufba.grouprecommendation.model.Vote;
@@ -79,8 +81,18 @@ public class RecommendationResource {
                 return String.valueOf(voteaverageWith.getScaleValue() + " " + voteaverageWith.getVote());
                 
              case 2:  
+                BordaCount bordaCount = (BordaCount) factory.getAlgorithm(AlgorithmsType.Type.BorderCount);
+                Vote votebordaCount = bordaCount.GetResult(listUser);
+                 
+                return String.valueOf(votebordaCount.getScaleValue());
+             case 3:
                  LeastMisery leastMisery = (LeastMisery) factory.getAlgorithm(AlgorithmsType.Type.LeastMisery);
                  Vote voteleastMisery = leastMisery.GetResult(listUser);
+                 
+                 return String.valueOf(voteleastMisery.getVote());
+             case 4:
+                 MostPleasure mostPleasure = (MostPleasure) factory.getAlgorithm(AlgorithmsType.Type.MostPleasure);
+                 Vote votemostPleasure = mostPleasure.GetResult(listUser);
                  
                  return String.valueOf(voteleastMisery.getVote());
         }
