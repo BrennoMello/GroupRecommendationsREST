@@ -5,15 +5,63 @@
  */
 package br.com.ufba.grouprecommendation.model;
 
-import java.util.Date;
-import java.util.List;
+import java.sql.Timestamp;
+
 
 /**
  *
- * @author edson
+ * @author Brenno Mello <brennodemello.bm at gmail.com>
  */
 public class Recomendacao {
     
-    private Date timeStamp;
-    private List<Usuario> listUser;
+    private String nameAlgorithms;
+    private Timestamp timeStamp;
+    private Vote consenso;
+
+    /**
+     * @return the timeStamp
+     */
+    public Timestamp getTimeStamp() {
+        return timeStamp;
+    }
+
+    /**
+     * @param timeStamp the timeStamp to set
+     */
+    public void setTimeStamp(Timestamp timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    /**
+     * @return the consenso
+     */
+    public Vote getConsenso() {
+        return consenso;
+    }
+
+    /**
+     * @param consenso the consenso to set
+     */
+    public void setConsenso(Vote consenso) {
+        this.consenso = consenso;
+    }
+
+    /**
+     * @return the nameAlgorithms
+     */
+    public String getNameAlgorithms() {
+        return nameAlgorithms;
+    }
+
+    /**
+     * @param nameAlgorithms the nameAlgorithms to set
+     */
+    public void setNameAlgorithms(String nameAlgorithms) {
+        this.nameAlgorithms = nameAlgorithms;
+    }
+
+   
+
+   
+  
 }

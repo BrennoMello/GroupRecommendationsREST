@@ -18,23 +18,23 @@ import javax.ws.rs.core.MediaType;
 import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsFactory;
 import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsType;
 import br.com.ufba.grouprecommendation.algoritmos.AverageWithoutMisery;
-import br.com.ufba.grouprecommendation.algoritmos.BordaCount;
 import br.com.ufba.grouprecommendation.algoritmos.LeastMisery;
-import br.com.ufba.grouprecommendation.algoritmos.MostPleasure;
 import br.com.ufba.grouprecommendation.algoritmos.Multiplicative;
+import br.com.ufba.grouprecommendation.algoritmos.BordaCount;
+import br.com.ufba.grouprecommendation.algoritmos.MostPleasure;
 import br.com.ufba.grouprecommendation.model.User;
 import br.com.ufba.grouprecommendation.model.Vote;
 import br.com.ufba.grouprecommendation.dao.Data;
-import br.com.ufba.grouprecommendation.dao.MySQLObject;
+import br.com.ufba.grouprecommendation.model.Recomendacao;
+import com.google.gson.Gson;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-
-
-        
-
+import javax.ws.rs.PathParam;
 
 /**
  * REST Web Service
@@ -47,10 +47,7 @@ public class RecommendationResource {
 
     @Context
     private UriInfo context;
-    
-    private List<User> ListData;
-    
-
+     
     /**
      * Creates a new instance of RecommendationResource
      */
@@ -64,40 +61,77 @@ public class RecommendationResource {
      * @return an instance of java.lang.String
      */
     
-    
     @GET
-    @Path("/recommenderIndividual")
+    @Path("/recommenderIndividual/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getRecommendation(@QueryParam("id") int id) throws SQLException, ParseException {
+    public String getRecommendation(@PathParam("id") int id)  {
         Data createData = new Data();
         AlgorithmsFactory factory = new AlgorithmsFactory();
         List<User> listUser = createData.getLastVotoTemp();
+        Gson gson = new Gson();
+        Recomendacao recomendacao = new Recomendacao();
+        
         
         switch (id) {
              case 1: 
                 AverageWithoutMisery averageWith = (AverageWithoutMisery) factory.getAlgorithm(AlgorithmsType.Type.AverageWithoutMisery);
                 Vote voteaverageWith = averageWith.GetResult(listUser, 1);
                 
-                return String.valueOf(voteaverageWith.getScaleValue() + " " + voteaverageWith.getVote());
+                recomendacao.setNameAlgorithms("AverageWithoutMisery");
+                recomendacao.setConsenso(voteaverageWith);
+                recomendacao.setTimeStamp(Timestamp.valueOf( LocalDateTime.now()));
+                        
+                        
+                return gson.toJson(recomendacao);
                 
              case 2:  
-                BordaCount bordaCount = (BordaCount) factory.getAlgorithm(AlgorithmsType.Type.BorderCount);
-                Vote votebordaCount = bordaCount.GetResult(listUser);
-                 
-                return String.valueOf(votebordaCount.getScaleValue());
+                BordaCount borderCount = (BordaCount) factory.getAlgorithm(AlgorithmsType.Type.BorderCount);
+                Vote voteborderCount = borderCount.GetResult(listUser);
+                
+                recomendacao.setNameAlgorithms("BorderCount");
+                recomendacao.setConsenso(voteborderCount);
+                recomendacao.setTimeStamp(Timestamp.valueOf(LocalDateTime.now()));
+                        
+                        
+                return gson.toJson(recomendacao);
              case 3:
-                 LeastMisery leastMisery = (LeastMisery) factory.getAlgorithm(AlgorithmsType.Type.LeastMisery);
-                 Vote voteleastMisery = leastMisery.GetResult(listUser);
+                LeastMisery leastMisery = (LeastMisery) factory.getAlgorithm(AlgorithmsType.Type.LeastMisery);
+                Vote voteleastMisery = leastMisery.GetResult(listUser);
+                
+                recomendacao.setNameAlgorithms("LeastMisery");
+                recomendacao.setConsenso(voteleastMisery);
+                recomendacao.setTimeStamp(Timestamp.valueOf(LocalDateTime.now()));
+                        
+                        
+                return gson.toJson(recomendacao);
                  
-                 return String.valueOf(voteleastMisery.getVote());
-             case 4:
-                 MostPleasure mostPleasure = (MostPleasure) factory.getAlgorithm(AlgorithmsType.Type.MostPleasure);
-                 Vote votemostPleasure = mostPleasure.GetResult(listUser);
                  
-                 return String.valueOf(voteleastMisery.getVote());
-        }
+             case 4:  
+                MostPleasure mostPleasure = (MostPleasure) factory.getAlgorithm(AlgorithmsType.Type.MostPleasure);
+                Vote voteMostPleasure = mostPleasure.GetResult(listUser);
+                
+                recomendacao.setNameAlgorithms("MostPleasure");
+                recomendacao.setConsenso(voteMostPleasure);
+                recomendacao.setTimeStamp(Timestamp.valueOf(LocalDateTime.now()));
+                        
+                        
+                return gson.toJson(recomendacao);
+                 
+             case 5:
+                Multiplicative multiplicative = (Multiplicative) factory.getAlgorithm(AlgorithmsType.Type.Multiplicative);
+                Vote voteMultiplicative = multiplicative.GetResult(listUser);
+                
+                recomendacao.setNameAlgorithms("Multiplicative");
+                recomendacao.setConsenso(voteMultiplicative);
+                recomendacao.setTimeStamp(Timestamp.valueOf(LocalDateTime.now()));
+                        
+                        
+                return gson.toJson(recomendacao);
         
-        return "VSF";
+            }
+        
+        recomendacao.setNameAlgorithms("Error parâmetro inválido");
+        return  gson.toJson(recomendacao);
     }
     
    
@@ -105,29 +139,15 @@ public class RecommendationResource {
     @Path("/recommenderAll")
     @Produces(MediaType.APPLICATION_JSON)
     public String getAllRecommendation(){
-            
-        /* TESTE DADOS BANCO */
-        Data e = new Data();
-        try {
-            ListData =  e.getMySQLSyntheticData(Integer.valueOf(2)); /* RECUPERAR DADOS DAS ULTIMAS DUAS HORAS */
-        } catch (SQLException ex) {
-            Logger.getLogger(RecommendationResource.class.getName()).log(Level.SEVERE, null, ex);
-            return ex.toString();
-        }
-       
+        Data createData = new Data();
+        AlgorithmsFactory factory = new AlgorithmsFactory();
+        List<User> listUser = createData.getLastVotoTemp();
+        Gson gson = new Gson();
+        List<Recomendacao> listRecomendacao = new ArrayList<>();   
+        
         
         return "ok";
-        
-        
-        
-//        AlgorithmsFactory f = new AlgorithmsFactory();
-//        Vote R;
-//        Multiplicative M;
-//        M = (Multiplicative) f.getAlgorithm(AlgorithmsType.Type.Multiplicative);
-//        return M.GetAll(ListData).toString();
-
-               
-        //return "FDP";
+       
     }
     
     
