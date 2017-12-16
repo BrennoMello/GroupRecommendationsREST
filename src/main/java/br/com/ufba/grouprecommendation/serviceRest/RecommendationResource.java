@@ -20,6 +20,8 @@ import br.com.ufba.grouprecommendation.algoritmos.AlgorithmsType;
 import br.com.ufba.grouprecommendation.algoritmos.AverageWithoutMisery;
 import br.com.ufba.grouprecommendation.algoritmos.LeastMisery;
 import br.com.ufba.grouprecommendation.algoritmos.Multiplicative;
+import br.com.ufba.grouprecommendation.algoritmos.BordaCount;
+import br.com.ufba.grouprecommendation.algoritmos.MostPleasure;
 import br.com.ufba.grouprecommendation.model.User;
 import br.com.ufba.grouprecommendation.model.Vote;
 import br.com.ufba.grouprecommendation.dao.Data;
@@ -79,11 +81,28 @@ public class RecommendationResource {
                 return String.valueOf(voteaverageWith.getScaleValue() + " " + voteaverageWith.getVote());
                 
              case 2:  
+                 BordaCount borderCount = (BordaCount) factory.getAlgorithm(AlgorithmsType.Type.BorderCount);
+                 Vote voteborderCount = borderCount.GetResult(listUser);
+                 
+                 return String.valueOf(voteborderCount.getScaleValue());
+             case 3:
                  LeastMisery leastMisery = (LeastMisery) factory.getAlgorithm(AlgorithmsType.Type.LeastMisery);
                  Vote voteleastMisery = leastMisery.GetResult(listUser);
                  
-                 return String.valueOf(voteleastMisery.getVote());
-        }
+                 return String.valueOf(voteleastMisery.getScaleValue());
+             case 4:  
+                 MostPleasure mostPleasure = (MostPleasure) factory.getAlgorithm(AlgorithmsType.Type.MostPleasure);
+                 Vote voteMostPleasure = mostPleasure.GetResult(listUser);
+                 
+                 return String.valueOf(voteMostPleasure.getScaleValue());
+             case 5:
+                 Multiplicative multiplicative = (Multiplicative) factory.getAlgorithm(AlgorithmsType.Type.Multiplicative);
+                 Vote voteMultiplicative = multiplicative.GetResult(listUser);
+                 
+                 return String.valueOf(voteMultiplicative.getScaleValue());
+              
+        
+            }
         
         return "VSF";
     }
