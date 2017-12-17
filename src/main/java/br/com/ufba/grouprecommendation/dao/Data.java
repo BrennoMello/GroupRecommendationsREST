@@ -183,6 +183,7 @@ public class Data {
            String sqlQueryUser =  " SELECT DISTINCT userid FROM mate84.users " ;
            ResultSet queryUsers = stmUser.executeQuery(sqlQueryUser);
            
+           //recuperar informações da tabela de usuários ativos
            Statement stmValue=  MySQLObject.getConexaoMySQL().createStatement(); 
            String sqlQueryValue =  " SELECT DISTINCT value FROM mate84.users ORDER BY value " ;
            ResultSet rsValue = stmValue.executeQuery(sqlQueryValue);

@@ -145,8 +145,61 @@ public class RecommendationResource {
         Gson gson = new Gson();
         List<Recomendacao> listRecomendacao = new ArrayList<>();   
         
+        AverageWithoutMisery averageWith = (AverageWithoutMisery) factory.getAlgorithm(AlgorithmsType.Type.AverageWithoutMisery);
+        Vote voteaverageWith = averageWith.GetResult(listUser, 1);
+        Recomendacao avarageRecomendacao = new Recomendacao();
         
-        return "ok";
+        avarageRecomendacao.setNameAlgorithms("AverageWithoutMisery");
+        avarageRecomendacao.setConsenso(voteaverageWith);
+        avarageRecomendacao.setTimeStamp(Timestamp.valueOf(LocalDateTime.now()));
+        
+        listRecomendacao.add(avarageRecomendacao);
+        
+        BordaCount borderCount = (BordaCount) factory.getAlgorithm(AlgorithmsType.Type.BorderCount);
+        Vote voteborderCount = borderCount.GetResult(listUser);
+                
+        Recomendacao borderRecomendacao = new Recomendacao();
+        
+        borderRecomendacao.setNameAlgorithms("BorderCount");
+        borderRecomendacao.setConsenso(voteborderCount);
+        borderRecomendacao.setTimeStamp(Timestamp.valueOf(LocalDateTime.now()));
+                
+        listRecomendacao.add(borderRecomendacao);
+        
+        LeastMisery leastMisery = (LeastMisery) factory.getAlgorithm(AlgorithmsType.Type.LeastMisery);
+        Vote voteleastMisery = leastMisery.GetResult(listUser);
+        
+        Recomendacao leastMiseryRecomendacao = new Recomendacao();
+                
+        leastMiseryRecomendacao.setNameAlgorithms("LeastMisery");
+        leastMiseryRecomendacao.setConsenso(voteleastMisery);
+        leastMiseryRecomendacao.setTimeStamp(Timestamp.valueOf(LocalDateTime.now()));
+        
+        listRecomendacao.add(leastMiseryRecomendacao);     
+        
+        MostPleasure mostPleasure = (MostPleasure) factory.getAlgorithm(AlgorithmsType.Type.MostPleasure);
+        Vote voteMostPleasure = mostPleasure.GetResult(listUser);
+                
+        Recomendacao mostPleasureRecomendacao = new Recomendacao();
+        
+        mostPleasureRecomendacao.setNameAlgorithms("MostPleasure");
+        mostPleasureRecomendacao.setConsenso(voteMostPleasure);
+        mostPleasureRecomendacao.setTimeStamp(Timestamp.valueOf(LocalDateTime.now()));
+        
+        listRecomendacao.add(mostPleasureRecomendacao);     
+        
+        Multiplicative multiplicative = (Multiplicative) factory.getAlgorithm(AlgorithmsType.Type.Multiplicative);
+        Vote voteMultiplicative = multiplicative.GetResult(listUser);
+        
+        Recomendacao multiplicativeRecomendacao = new Recomendacao();
+        
+        multiplicativeRecomendacao.setNameAlgorithms("Multiplicative");
+        multiplicativeRecomendacao.setConsenso(voteMultiplicative);
+        multiplicativeRecomendacao.setTimeStamp(Timestamp.valueOf(LocalDateTime.now()));
+        
+        listRecomendacao.add(multiplicativeRecomendacao);     
+        
+        return gson.toJson(listRecomendacao);
        
     }
     
