@@ -4,11 +4,8 @@ package br.com.ufba.grouprecommendation.algoritmos;
 import br.com.ufba.grouprecommendation.model.User;
 import br.com.ufba.grouprecommendation.model.Vote;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
  public class BordaCount  extends Algorithms {
